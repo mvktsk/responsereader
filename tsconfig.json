@@ -4,6 +4,10 @@
     "rootDir": ".",
     "outDir": "build",
     "sourceRoot": "src",
+    "module": "ES2020",
+    "moduleResolution": "node",
+    "strict": false,
+    "esModuleInterop": true
   },
   "include": [
     "src/**/*.ts",

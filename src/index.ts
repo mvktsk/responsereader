@@ -1,12 +1,14 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
+import readline from 'readline';
+interface Metrics {
+  count: number;
+}
 
 const minutes = 1;
 const timeOut = 1000 * 60 * minutes;
 
 const serversArray = ['maria.ru', 'rose.ru', 'sina.ru'];
 const apiPath = '/api/count';
-
-const readline = require('readline');
 
 readline.emitKeypressEvents(process.stdin);
 
@@ -47,7 +49,7 @@ async function getMetrics(server: string, timestamp: string) {
   try {
     const url = `http://${server}/${apiPath}`;
     const response = await fetch(url);
-    const json = await response.json();
+    const json = (await response.json()) as Metrics;
     console.log(`${timestamp} ${server} ${json.count}`);
   } catch (error) {
     console.log(`${timestamp} ${server} error: ${error}`);
