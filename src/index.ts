@@ -1,9 +1,10 @@
+const fetch = require('node-fetch');
+
 const minutes = 1;
 const timeOut = 1000 * 60 * minutes;
 
 const serversArray = ['maria.ru', 'rose.ru', 'sina.ru'];
-
-let isQuit = false;
+const apiPath = '/api/count';
 
 const readline = require('readline');
 
@@ -20,18 +21,12 @@ console.log(`Timeout: ${timeOut / 60000} minutes.`);
 console.log('Press q to quit');
 
 const handle = setInterval(() => {
-  if (isQuit) {
-    clearInterval(handle);
-    // eslint-disable-next-line no-process-exit
-    process.exit(0);
-  } else {
-    console.log(roundToNearestMinute());
-  }
+  const timestamp = roundToNearestMinute();
+  serversArray.forEach(server => getMetrics(server, timestamp));
 }, timeOut);
 
 process.stdin.on('keypress', (str, key) => {
   if (key.name === 'q') {
-    isQuit = true;
     clearInterval(handle);
     // eslint-disable-next-line no-process-exit
     process.exit(0);
@@ -46,4 +41,15 @@ function roundToNearestMinute(date = new Date()) {
   );
 
   return result.toISOString().replace('T', ' ').replace('.000Z', '');
+}
+
+async function getMetrics(server: string, timestamp: string) {
+  try {
+    const url = `http://${server}/${apiPath}`;
+    const response = await fetch(url);
+    const json = await response.json();
+    console.log(`${timestamp} ${server} ${json.count}`);
+  } catch (error) {
+    console.log(`${timestamp} ${server} error: ${error}`);
+  }
 }
